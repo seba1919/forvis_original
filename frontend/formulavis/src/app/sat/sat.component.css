@@ -1,0 +1,83 @@
+#sat-container {
+  margin: 0 auto;
+  font-size: 0.8em;
+  max-width: 50em;
+}
+
+.filename {
+  max-width: 50%;
+}
+
+td {
+  padding: 0;
+}
+
+
+.btn {
+  font-size: 1em;
+}
+
+button {
+  width: 7em;
+}
+
+.buttons {
+  margin-top: 1em;
+  text-align: center;
+}
+
+.table {
+  width: 100%;
+}
+
+.file {
+  width: 100%;
+  height: 4em;
+  margin-bottom: 1em;
+  background-color: rgba(164, 205, 226, 0.65);
+  color: rgba(21, 21, 21, 0.74);
+  position: relative;
+}
+
+.file-info {
+  display: block;
+  word-break: break-all;
+  position: absolute;
+  width: 49%;
+  left: 0.5em;
+  padding: 0.5em 0 0.5em 0;
+}
+
+#files .buttons {
+  display: block;
+  margin-top: 0;
+  font-size: 0.9em;
+  position: absolute;
+  right: 0.5em;
+  bottom: 0.5em;
+  height: 3em;
+}
+
+.file-info {
+  display: block;
+  width: 49%;
+  font-weight: 800;
+}
+
+.minimized {
+  background-color: rgba(154, 226, 171, 0.65);
+}
+
+.refresh {
+  display: inline-block;
+  float: right;
+}
+
+.header-title {
+  display: inline-block;
+}
+
+.header-files {
+  margin-bottom: 1em;
+}
+

@@ -1,0 +1,4 @@
+frontend/node_env
+frontend/node_modules
+
+formulavis/local_settings.py

@@ -1,0 +1,12 @@
+nav {
+  margin-bottom: 1em;
+}
+
+.mr-auto, .mx-auto {
+    margin-left: auto!important;
+}
+
+.mr-auto, .mx-auto {
+    margin-right: inherit!important;
+    color: #000000;
+}

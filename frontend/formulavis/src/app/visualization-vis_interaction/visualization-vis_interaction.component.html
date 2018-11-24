@@ -1,0 +1,12 @@
+<div class="subnav">
+    <h3>Interaction Graph ({{ fileName }})</h3>
+    <div class="buttons">
+        <button class="btn btn-info" (click)="startStab()" [disabled]="stabilizationInProgress">Start Stabilization</button>
+        <button class="btn btn-info" (click)="stopStab()" [disabled]="!stabilizationInProgress">Stop Stabilization</button>
+    </div>
+    <div id="info" *ngIf="info">
+        <div id="message" class="alert alert-info">{{ info }}</div>
+    </div>
+</div>
+<div id="visualization"></div>
+<div *ngIf="loading" class="loader"></div>

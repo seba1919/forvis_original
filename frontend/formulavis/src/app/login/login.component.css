@@ -1,0 +1,10 @@
+#login-form {
+  max-width: 30em;
+  margin: 0 auto;
+}
+
+#login-form .alert-danger {
+  font-size: 0.8em;
+  margin-bottom: 0;
+  padding: .3rem 1rem;
+}
