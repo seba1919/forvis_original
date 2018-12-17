@@ -78,6 +78,11 @@ export class VisualizationVisResolutionComponent implements OnInit {
 
            this.nodes = new DataSet(data['content']['data']['nodes']);
            this.edges = new DataSet(data['content']['data']['edges']);
+           this.nodes.forEach(node => {
+             if (node.font && node.font.size < 1) {
+               node.font.size = 1;
+             }
+           });
 
            let container = document.getElementById('visualization');
            let _data = {
@@ -96,7 +101,7 @@ export class VisualizationVisResolutionComponent implements OnInit {
                },
                "maxVelocity": 1,
                "minVelocity": 1,
-               "timeStep": 0.1,
+               "timestep": 0.1,
              }
            };
            this.loading = true;
