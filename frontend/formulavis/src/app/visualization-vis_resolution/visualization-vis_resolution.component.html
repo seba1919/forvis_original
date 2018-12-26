@@ -1,12 +1,39 @@
-<div class="subnav">
+<div class="container">
+  <div class="text-md-center">
     <h3>Resolution Graph ({{ fileName }})</h3>
-    <div class="buttons">
-        <button class="btn btn-info" (click)="startStab()" [disabled]="stabilizationInProgress">Start Stabilization</button>
-        <button class="btn btn-info" (click)="stopStab()" [disabled]="!stabilizationInProgress">Stop Stabilization</button>
+  </div>
+  <form #resolutionGraphForm="ngForm">
+    <div class="form-group col-md-6 mr-auto">
+      <p>To draw resolution graph you can use:</p>
+      <div>
+        <label>
+          <input type="radio" name="varType" [(ngModel)]="isSelectAll" [value]="true" required>all variables
+        </label>
+      </div>
+      <div>
+        <label>
+          <input type="radio" #varsSub name="varType" [(ngModel)]="isSelectAll" [value]="false" required>variables subset
+        </label>
+      </div>
     </div>
-    <div id="info" *ngIf="info">
-        <div id="message" class="alert alert-info">{{ info }}</div>
+    <div class="form-group mr-auto" *ngIf="varsSub.checked">
+      <label class="col-md-6" for="varSelect">Select single or multiple variables to draw resolution graph: </label>
+      <div class="col-md-4">
+        <ngx-select-dropdown id="varSelect" [options]="variables" [config]="selectConfig" [(value)]="selectedVariables"
+                             multiple="true" required></ngx-select-dropdown>
+      </div>
     </div>
+    <button type="button" class="btn btn-primary" [disabled]="!resolutionGraphForm.form.valid" (click)="onDraw()">
+      Draw
+    </button>
+  </form>
+  <div class="buttons col-md-6 mx-auto" *ngIf="isLoaded">
+    <button class="btn btn-info" (click)="startStab()" [disabled]="stabilizationInProgress">Start Stabilization</button>
+    <button class="btn btn-info" (click)="stopStab()" [disabled]="!stabilizationInProgress">Stop Stabilization</button>
+  </div>
+  <div id="info" *ngIf="info">
+    <div id="message" class="alert alert-info">{{ info }}</div>
+  </div>
 </div>
 <div id="visualization"></div>
 <div *ngIf="loading" class="loader"></div>

@@ -26,6 +26,7 @@
     "jquery": "^3.2.1",
     "ng2-file-upload": "^1.2.1",
     "ngx-bootstrap": "^2.0.0-beta.8",
+    "ngx-select-dropdown": "^0.8.1",
     "rxjs": "^5.5.2",
     "vis": "^4.21.0",
     "zone.js": "^0.8.14"
