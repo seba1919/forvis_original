@@ -13,7 +13,7 @@ from profiles.models import JsonFile, TextFile, Profile
 
 
 @app.task()
-def create_json(obj_id, js_id, js_format):
+def create_json(obj_id, js_id, js_format, selected_vars):
     formats = {
         'sat_vis_factor': create_sat_vis_factor,
         'sat_vis_interaction': create_sat_vis_interaction,
@@ -21,14 +21,15 @@ def create_json(obj_id, js_id, js_format):
         'maxsat_vis_factor': create_maxsat_vis_factor,
         'maxsat_vis_interaction': create_maxsat_vis_interaction,
         'maxsat_vis_resolution': create_maxsat_vis_resolution,
+        'variables': create_variables_list,
         'raw': create_raw
     }
 
-    formats.get(js_format).delay(obj_id, js_id, js_format)
+    formats.get(js_format).delay(obj_id, js_id, js_format, selected_vars)
 
 
 @app.task()
-def create_sat_vis_factor(obj_id, js_id, js_format):
+def create_sat_vis_factor(obj_id, js_id, js_format, selected_vars):
     print("SAT_VIS_FACTOR")
     obj = JsonFile.objects.get(id=js_id)
 
@@ -80,7 +81,7 @@ def create_sat_vis_factor(obj_id, js_id, js_format):
 
 
 @app.task()
-def create_sat_vis_interaction(obj_id, js_id, js_format):
+def create_sat_vis_interaction(obj_id, js_id, js_format, selected_vars):
     print("SAT_VIS_INTERACTION")
     obj = JsonFile.objects.get(id=js_id)
 
@@ -129,7 +130,7 @@ def create_sat_vis_interaction(obj_id, js_id, js_format):
 
 
 @app.task()
-def create_sat_vis_resolution(obj_id, js_id, js_format):
+def create_sat_vis_resolution(obj_id, js_id, js_format, selected_vars):
     print("SAT_VIS_RESOLUTION")
     obj = JsonFile.objects.get(id=js_id)
 
@@ -163,9 +164,11 @@ def create_sat_vis_resolution(obj_id, js_id, js_format):
                 clause += 1
                 nodes_tmp[clause] = {"id": clause, "label": 'C_' + str(clause)}
                 for n in numbers:
-                    if n not in variables.keys():
+                    if n not in variables and (selected_vars is None or len(selected_vars) == 0 or
+                                               n in selected_vars or -n in selected_vars):
                         variables[n] = []
-                    variables[n].append(clause)
+                    if n in variables:
+                        variables[n].append(clause)
 
     for v, clause_list_1 in variables.items():
         if v < 0:
@@ -186,7 +189,47 @@ def create_sat_vis_resolution(obj_id, js_id, js_format):
 
 
 @app.task()
-def create_raw(obj_id, js_id, js_format):
+def create_variables_list(obj_id, js_id, js_format, selected_vars):
+    print("SAT_VARIABLES")
+    obj = JsonFile.objects.get(id=js_id)
+
+    obj.status = 'pending'
+    obj.save()
+
+    data = {
+        "info": None,
+        "variables": []
+    }
+
+    variables = {}
+
+    text_file = TextFile.objects.get(id=obj_id)
+    with open(text_file.content.path) as f:
+        text = File(f)
+        for line in text:
+            if line.startswith('c') or line.startswith('C') or line in ['', ' ']:
+                continue
+            if line.startswith('p'):
+                data['info'] = line.split(' ')
+            else:
+                numbers = [int(x) for x in list(filter(lambda x: x != '', line.strip().split(' ')))[:-1]]
+                if not numbers:
+                    continue
+                for n in numbers:
+                    if n >= 0 and n not in variables.keys():
+                        variables[n] = []
+                    if n < 0 and -n not in variables.keys():
+                        variables[-n] = []
+
+    data['variables'] = list(variables.keys())
+
+    obj.content = data
+    obj.status = 'done'
+    obj.save()
+
+
+@app.task()
+def create_raw(obj_id, js_id, js_format, selected_vars):
     print("RAW")
     obj = JsonFile.objects.get(id=js_id)
     text_file = TextFile.objects.get(id=obj_id)
@@ -231,7 +274,7 @@ def create_minimized(obj_id, profile_id):
 
 
 @app.task()
-def create_maxsat_vis_factor(obj_id, js_id, js_format):
+def create_maxsat_vis_factor(obj_id, js_id, js_format, selected_vars):
     print("MAXSAT_VIS_FACTOR")
     obj = JsonFile.objects.get(id=js_id)
 
@@ -265,7 +308,8 @@ def create_maxsat_vis_factor(obj_id, js_id, js_format):
                 clause_id = -clause
                 clause_weight = numbers[0]
                 del numbers[0]
-                nodes_tmp['C_' + str(clause)] = {"id": clause_id, "font":{"size": clause_weight}, "label": 'C_' + str(clause), "group": 0}                
+                nodes_tmp['C_' + str(clause)] = {"id": clause_id, "font": {"size": clause_weight},
+                                                 "label": 'C_' + str(clause), "group": 0}
 
                 for n in numbers:
                     y = abs(n)
@@ -285,7 +329,7 @@ def create_maxsat_vis_factor(obj_id, js_id, js_format):
 
 
 @app.task()
-def create_maxsat_vis_interaction(obj_id, js_id, js_format):
+def create_maxsat_vis_interaction(obj_id, js_id, js_format, selected_vars):
     print("MAXSAT_VIS_INTERACTION")
     obj = JsonFile.objects.get(id=js_id)
 
@@ -334,7 +378,7 @@ def create_maxsat_vis_interaction(obj_id, js_id, js_format):
 
 
 @app.task()
-def create_maxsat_vis_resolution(obj_id, js_id, js_format):
+def create_maxsat_vis_resolution(obj_id, js_id, js_format, selected_vars):
     print("MAXSAT_VIS_RESOLUTION")
     obj = JsonFile.objects.get(id=js_id)
 
@@ -368,11 +412,12 @@ def create_maxsat_vis_resolution(obj_id, js_id, js_format):
                 clause += 1
                 clause_weight = numbers[0]
                 del numbers[0]
-                nodes_tmp[clause] = {"id": clause, "font":{"size": clause_weight}, "label": 'C_' + str(clause)}
+                nodes_tmp[clause] = {"id": clause, "font": {"size": clause_weight}, "label": 'C_' + str(clause)}
                 for n in numbers:
-                    if n not in variables.keys():
+                    if n not in variables and (selected_vars is None or len(selected_vars) == 0 or n in selected_vars or -n in selected_vars):
                         variables[n] = []
-                    variables[n].append(clause)
+                    if n in variables:
+                        variables[n].append(clause)
 
     for v, clause_list_1 in variables.items():
         if v < 0:
@@ -390,4 +435,3 @@ def create_maxsat_vis_resolution(obj_id, js_id, js_format):
     obj.content = data
     obj.status = 'done'
     obj.save()
-

@@ -1,6 +1,7 @@
 import os
 
 from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch.dispatcher import receiver
@@ -19,6 +20,7 @@ FORMATS = (
     ('sat_vis_interaction', 'sat_vis_interaction'),
     ('sat_vis_resolution', 'sat_vis_resolution'),
     ('raw', 'raw'),
+    ('variables', 'variables'),
     ('maxsat_vis_factor', 'maxsat_vis_factor'),
     ('maxsat_vis_interaction', 'maxsat_vis_interaction'),
     ('maxsat_vis_resolution', 'maxsat_vis_resolution'),
@@ -41,6 +43,7 @@ class JsonFile(models.Model):
     text_file = models.ForeignKey(TextFile, related_name='json', on_delete=models.CASCADE)
     status = models.CharField(choices=STATUS, default='empty', max_length=10)
     json_format = models.CharField(choices=FORMATS, max_length=255)
+    selected_vars = ArrayField(base_field=models.IntegerField(), default=list)
     content = JSONField(default={})
 
 

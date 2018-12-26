@@ -1,9 +1,9 @@
-from django.http.response import Http404, JsonResponse
+from django.http.response import Http404
 from rest_framework import status
+from rest_framework.generics import ListAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, DestroyAPIView, RetrieveAPIView
 
 from profiles.models import Profile, TextFile
 from profiles.serializers import TextFileSerializer, TextFileSerializerDetail
@@ -94,5 +94,3 @@ class TextMaxSatFileView(DestroyAPIView, RetrieveAPIView):
             raise Http404
         text_file.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-

@@ -25,16 +25,18 @@ class TextFileSerializerDetail(TextFileSerializer):
         msg = ""
 
         chosen_format = self.context['view'].kwargs.get('vistype')
+        selected_vars = [int(x) for x in self.context['request'].query_params.getlist('selectedVariables', None)]
         c = (chosen_format, chosen_format)
         if c in FORMATS:
             json_file, j_c = JsonFile.objects.get_or_create(
                 text_file=obj,
-                json_format=chosen_format
+                json_format=chosen_format,
+                selected_vars=selected_vars
             )
             status = json_file.status
 
             if status == 'empty':
-                create_json.delay(obj.id, json_file.id, json_file.json_format)
+                create_json.delay(obj.id, json_file.id, json_file.json_format, selected_vars)
                 msg = "Formatting started."
 
             if status == 'pending':
