@@ -289,7 +289,7 @@ def create_maxsat_vis_factor(obj_id, js_id, js_format, selected_vars):
 
     nodes_tmp = {}
     edges_tmp = {}
-
+    clause_weights = {}
     clause = 0
 
     text_file = TextFile.objects.get(id=obj_id)
@@ -305,22 +305,22 @@ def create_maxsat_vis_factor(obj_id, js_id, js_format, selected_vars):
                 if not numbers:
                     continue
                 clause += 1
-                clause_id = -clause
-                clause_weight = numbers[0]
+                clause_weights[clause] = numbers[0]
                 del numbers[0]
-                nodes_tmp['C_' + str(clause)] = {"id": clause_id, "font": {"size": clause_weight},
-                                                 "label": 'C_' + str(clause), "group": 0}
 
                 for n in numbers:
                     y = abs(n)
-                    nodes_tmp[y] = {"id": y, "label": str(y), "group": 1}
+                    nodes_tmp[y] = {"id": y, "label": str(y)}
 
                 for n in numbers:
-                    k = (abs(n), clause_id)
+                    k = (abs(n), -clause)
                     color = 'red' if n < 0 else 'green'
                     edges_tmp[k] = {"from": k[0], "to": k[1], "color": {"color": color, "opacity": 1}}
 
+    min_cw = min(clause_weights.values())
+    max_cw = max(clause_weights.values())
     data['nodes'] = [v for k, v in nodes_tmp.items()]
+    data['nodes'].extend([get_node(-c, cw, min_cw, max_cw) for c, cw in clause_weights.items()])
     data['edges'] = [v for k, v in edges_tmp.items()]
 
     obj.content = data
@@ -391,6 +391,7 @@ def create_maxsat_vis_resolution(obj_id, js_id, js_format, selected_vars):
         "edges": []
     }
 
+    clause_weights = {}
     nodes_tmp = {}
     edges_tmp = {}
 
@@ -410,9 +411,8 @@ def create_maxsat_vis_resolution(obj_id, js_id, js_format, selected_vars):
                 if not numbers:
                     continue
                 clause += 1
-                clause_weight = numbers[0]
+                clause_weights[clause] = numbers[0]
                 del numbers[0]
-                nodes_tmp[clause] = {"id": clause, "font": {"size": clause_weight}, "label": 'C_' + str(clause)}
                 for n in numbers:
                     if n not in variables and (selected_vars is None or len(selected_vars) == 0 or n in selected_vars or -n in selected_vars):
                         variables[n] = []
@@ -429,9 +429,21 @@ def create_maxsat_vis_resolution(obj_id, js_id, js_format, selected_vars):
                 for c2 in clause_list_2:
                     edges_tmp[(c1, c2)] = {"from": c1, "to": c2}
 
-    data['nodes'] = [v for k, v in nodes_tmp.items()]
+    min_cw = min(clause_weights.values())
+    max_cw = max(clause_weights.values())
+    data['nodes'] = [get_node(c, cw, min_cw, max_cw) for c, cw in clause_weights.items()]
     data['edges'] = [v for k, v in edges_tmp.items()]
 
     obj.content = data
     obj.status = 'done'
     obj.save()
+
+def get_node(clause, clause_weight, min_cw, max_cw):
+	return {"id": clause, "color": {"background": get_clause_color(clause_weight, min_cw, max_cw)}, "label": 'C_{}'.format(abs(clause))}
+
+def get_clause_color(cw, min_cw, max_cw):
+	normalized_cw = normalize_value(cw, min_cw, max_cw)
+	return "rgba(255, {}, {})".format(normalized_cw, normalized_cw)
+
+def normalize_value(v, min_v, max_v):
+	return int((v - min_v) * 255 / (max_v - min_v))
