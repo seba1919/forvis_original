@@ -24,6 +24,7 @@
     "bootstrap": "^4.0.0-beta.2",
     "core-js": "^2.4.1",
     "jquery": "^3.2.1",
+    "ng-recaptcha": "^4.2.1",
     "ng2-file-upload": "^1.2.1",
     "ngx-bootstrap": "^2.0.0-beta.8",
     "ngx-select-dropdown": "^0.8.1",

@@ -22,6 +22,7 @@ import {VisualizationVisInteractionComponent} from './visualization-vis_interact
 import {VisualizationVisResolutionComponent} from './visualization-vis_resolution/visualization-vis_resolution.component';
 import {MaxsatComponent} from './maxsat/maxsat.component';
 import {SelectDropDownModule} from 'ngx-select-dropdown';
+import {RecaptchaModule} from "ng-recaptcha";
 
 
 const appRoutes: Routes = [
@@ -61,7 +62,8 @@ const appRoutes: Routes = [
     FormsModule,
     HttpModule,
     FileUploadModule,
-    SelectDropDownModule
+    SelectDropDownModule,
+    RecaptchaModule
   ],
   providers: [
     AuthGuard,
