@@ -23,6 +23,12 @@ server {
                 proxy_temp_file_write_size 64k;
                 proxy_pass http://backend;
         }
+        location /admin {
+                proxy_pass http://backend;
+        }
+        location /static/admin/css {
+                proxy_pass http://backend;
+        }
         location / {
                 proxy_set_header        Host $http_host;
                 proxy_set_header        X-Real-IP $remote_addr;
