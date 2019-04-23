@@ -1,0 +1,28 @@
+<div id="register-form">
+    <div class="form-group">
+      <input id="name" name="name" type="text" class="form-control" required [(ngModel)]="user.name" #name="ngModel"
+             placeholder="Username">
+      <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+        <div *ngIf="name.errors.required">
+          Username is required.
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <input id="password" type="password" name="password" class="form-control" required [(ngModel)]="user.password"
+             #password="ngModel" placeholder="Password">
+      <div *ngIf="password.invalid && (password.dirty || password.touched)" class="alert alert-danger">
+        <div *ngIf="password.errors.required">
+          Password is required.
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <re-captcha (resolved)="captchaResolved($event)" siteKey="6LdytYkUAAAAAKqK8yHQstHQGSixh54IT7qPd67Z"></re-captcha>
+    </div>
+    <button type="submit" class="btn btn-block btn-info" [disabled]="!password.valid || !name.valid || !captchaValid"
+            (click)="register()">
+      Register
+    </button>
+  </div>
+  

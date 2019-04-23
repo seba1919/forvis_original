@@ -2,39 +2,34 @@ import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 
 
-import {AuthService} from "../_services/auth.service";
+import {RegisterService} from "../_services/register.service";
 import {AlertService} from "../_services/alert.service";
 
 import {User} from '../_models';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'app-register',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
 })
-export class LoginComponent {
+export class RegisterComponent {
   user: User = new User;
-
   captchaValid: boolean = false;
 
   constructor(
-    private authService: AuthService,
+    private regsterService: RegisterService,
     private alertService: AlertService,
     private router: Router) {
   }
 
-  login() {
+  register() {
     if (!this.captchaValid) {
       return;
     }
-    this.authService.tokenAuth(this.user).subscribe(
-      data => this.router.navigate(['sat']),
-      error => this.alertService.error(error)
+    this.regsterService.register(this.user).subscribe(
+        data => this.router.navigate(['login']),
+        error => this.alertService.error(error)
     )
-  }
-
-  goToRegistration() {
-    this.router.navigate(['register']);
   }
 
   captchaResolved(captchaResponse: string) {

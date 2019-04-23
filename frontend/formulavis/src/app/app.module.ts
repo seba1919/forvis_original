@@ -7,12 +7,13 @@ import {RouterModule, Routes} from '@angular/router';
 
 import {AppComponent} from './app.component';
 import {LoginComponent} from './login/login.component';
+import {RegisterComponent} from './register/register.component';
 import {HomeComponent} from './home/home.component';
 import {MenuComponent} from './menu/menu.component';
 import {AlertComponent} from './alert/alert.component';
 import {SatComponent} from './sat/sat.component';
 
-import {AlertService, AuthService, FileService, VisMenuService} from './_services';
+import {AlertService, AuthService, FileService, VisMenuService, RegisterService} from './_services';
 
 import {AuthGuard} from './_guards/auth.guard';
 import {VisMenuComponent} from './vis-menu/vis-menu.component';
@@ -27,6 +28,7 @@ import {RecaptchaModule} from "ng-recaptcha";
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
+  {path: 'register', component: RegisterComponent},
   {path: 'home', component: HomeComponent},
   {path: 'visualization-vis_resolution', component: VisualizationVisResolutionComponent, canActivate: [AuthGuard]},
   {path: 'visualization-vis_factor', component: VisualizationVisFactorComponent, canActivate: [AuthGuard]},
@@ -42,6 +44,7 @@ const appRoutes: Routes = [
   declarations: [
     AppComponent,
     LoginComponent,
+    RegisterComponent,
     HomeComponent,
     MenuComponent,
     AlertComponent,
@@ -68,6 +71,7 @@ const appRoutes: Routes = [
   providers: [
     AuthGuard,
     AlertService,
+    RegisterService,
     AuthService,
     FileService,
     VisMenuService
