@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {Router} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 
 
 import {AuthService} from "../_services/auth.service";
@@ -20,17 +20,25 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private alertService: AlertService,
-    private router: Router) {
+    private router: Router,
+    private route: ActivatedRoute) {
   }
 
   login() {
     if (!this.captchaValid) {
       return;
     }
+    let returnUrl = 'sat';
+    
+    this.route.queryParams.subscribe(next => {
+      if(next["returnUrl"])
+        returnUrl = next["returnUrl"];
+    });
+
     this.authService.tokenAuth(this.user).subscribe(
-      data => this.router.navigate(['sat']),
+      data => this.router.navigate([returnUrl]),
       error => this.alertService.error(error)
-    )
+    );
   }
 
   captchaResolved(captchaResponse: string) {
