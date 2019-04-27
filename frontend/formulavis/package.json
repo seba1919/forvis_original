@@ -23,7 +23,7 @@
     "@angular/router": "^5.0.0",
     "bootstrap": "^4.0.0-beta.2",
     "core-js": "^2.4.1",
-    "jquery": "^3.2.1",
+    "jquery": "^3.4.0",
     "ng-recaptcha": "^4.2.1",
     "ng2-file-upload": "^1.2.1",
     "ngx-bootstrap": "^2.0.0-beta.8",
