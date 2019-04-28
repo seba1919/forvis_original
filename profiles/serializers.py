@@ -1,7 +1,21 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 
 from profiles.models import TextFile, JsonFile, FORMATS
 from .tasks import create_json
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username','password')
+        extra_kwargs = {'password' : {'write_only':True, 'required':True}}
+    
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'])
+        user.save()
+        return user
 
 
 class TextFileSerializer(serializers.ModelSerializer):

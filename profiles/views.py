@@ -1,17 +1,23 @@
 from django.http.response import Http404
+from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.generics import ListAPIView, DestroyAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, DestroyAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from profiles.models import Profile, TextFile
-from profiles.serializers import TextFileSerializer, TextFileSerializerDetail
+from profiles.serializers import TextFileSerializer, TextFileSerializerDetail, UserSerializer
 
 
 def get_profile(user):
     return Profile.objects.get_or_create(user=user)[0]
 
+class RegistrationView(CreateAPIView):
+    model = User
+    permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
 
 class SatFileUploadView(APIView):
     parser_classes = (MultiPartParser,)
