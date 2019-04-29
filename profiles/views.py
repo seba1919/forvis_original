@@ -104,7 +104,8 @@ class TextMaxSatFileView(DestroyAPIView, RetrieveAPIView):
 
 
 class ObtainLoginTokenView(ObtainJSONWebToken):
-    result = super(ObtainLoginTokenView, self).post(request)
-    user = User.objects.get(username = request.data['username'])
-    update_last_login(None, user)           
-    return result
+    def post(self, request):
+        result = super(ObtainLoginTokenView, self).post(request)
+        user = User.objects.get(username = request.data['username'])
+        update_last_login(None, user)           
+        return result
