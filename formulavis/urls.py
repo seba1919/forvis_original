@@ -22,12 +22,14 @@ from rest_framework_jwt.views import verify_jwt_token
 
 from formulavis import settings
 from profiles.urls import urlpatterns as profile
+from profiles.views import ObtainLoginTokenView
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^profile/', include(profile)),
 
-    url(r'^auth/api-token-auth/', obtain_jwt_token),
+    url(r'^auth/api-token-auth/', ObtainLoginTokenView.as_view()),
     url(r'^auth/api-token-refresh/', refresh_jwt_token),
     url(r'^auth/api-token-verify/', verify_jwt_token),
 

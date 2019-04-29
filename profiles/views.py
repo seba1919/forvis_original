@@ -1,11 +1,12 @@
 from django.http.response import Http404
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, update_last_login
 from rest_framework import status
 from rest_framework.generics import ListAPIView, DestroyAPIView, RetrieveAPIView, CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_jwt.views import ObtainJSONWebToken
 
 from profiles.models import Profile, TextFile
 from profiles.serializers import TextFileSerializer, TextFileSerializerDetail, UserSerializer
@@ -100,3 +101,10 @@ class TextMaxSatFileView(DestroyAPIView, RetrieveAPIView):
             raise Http404
         text_file.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ObtainLoginTokenView(ObtainJSONWebToken):
+    result = super(ObtainLoginTokenView, self).post(request)
+    user = User.objects.get(username = request.data['username'])
+    update_last_login(None, user)           
+    return result
