@@ -5,3 +5,4 @@ frontend/formulavis/node_modules
 */__pycache__
 _files
 _satelite
+.idea/
