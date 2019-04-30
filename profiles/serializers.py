@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 from profiles.models import TextFile, JsonFile, FORMATS
 from .tasks import create_json
+import requests
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

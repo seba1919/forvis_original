@@ -10,7 +10,7 @@ from rest_framework_jwt.views import ObtainJSONWebToken
 
 from profiles.models import Profile, TextFile
 from profiles.serializers import TextFileSerializer, TextFileSerializerDetail, UserSerializer
-
+import requests
 
 def get_profile(user):
     return Profile.objects.get_or_create(user=user)[0]
@@ -19,6 +19,32 @@ class RegistrationView(CreateAPIView):
     model = User
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
+
+    def post(self, request):
+
+        if not ('recaptcha' in request.data and 'username' in request.data and 'password' in request.data):
+            return Response(status=400)
+
+        recaptcha_response = request.data['recaptcha']
+
+        recaptcha_result = requests.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={
+                'secret': "6LeWIqEUAAAAABN_-9wZx0GfWl4egIBQpvbYmwx9",
+                'response': recaptcha_response
+            }
+        ).json().get("success",False)
+
+        if not recaptcha_result:
+            return Response(status=400)
+
+        user = User.objects.create_user(
+            username=request.data['username'],
+            password=request.data['password'])
+        user.save()
+
+        return Response(status=200)
+
 
 class SatFileUploadView(APIView):
     parser_classes = (MultiPartParser,)
@@ -105,6 +131,23 @@ class TextMaxSatFileView(DestroyAPIView, RetrieveAPIView):
 
 class ObtainLoginTokenView(ObtainJSONWebToken):
     def post(self, request):
+
+        if not ('recaptcha' in request.data and 'username' in request.data and 'password' in request.data):
+            return Response(status=400)
+
+        recaptcha_response = request.data['recaptcha']
+
+        recaptcha_result = requests.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={
+                'secret': "6LeWIqEUAAAAABN_-9wZx0GfWl4egIBQpvbYmwx9",
+                'response': recaptcha_response
+            }
+        ).json().get("success",False)
+
+        if not recaptcha_result:
+            return Response(status=400)
+
         result = super(ObtainLoginTokenView, self).post(request)
         user = User.objects.get(username = request.data['username'])
         update_last_login(None, user)           

@@ -8,3 +8,4 @@ pydevd==1.1.1
 nodeenv==1.2.0
 redis==2.10.6
 kombu==4.1.0
+requests==2.21.0
