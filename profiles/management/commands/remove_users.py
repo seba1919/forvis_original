@@ -10,9 +10,9 @@ class Command(BaseCommand):
     help = ''
 
     def handle(self, *args, **kwargs):
-    users = User.objects.all()
-    now = datetime.now(tz=timezone.utc)
+    	users = User.objects.all()
+    	now = datetime.now(tz=timezone.utc)
 
-    for user in users:
-        if now - user.last_login > timedelta(days=6*30):
-            user.delete()
+    	for user in users:
+        	if now - user.last_login > timedelta(days=6*30):
+            	user.delete()
