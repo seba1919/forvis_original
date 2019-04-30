@@ -14,4 +14,4 @@ class Command(BaseCommand):
 
 		for user in users:
     		if now - user.last_login > timedelta(days=6*30):
-       		user.delete()
+       			user.delete()
