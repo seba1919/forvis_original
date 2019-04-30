@@ -15,6 +15,7 @@ import {User} from '../_models';
 export class RegisterComponent {
   user: User = new User;
   captchaValid: boolean = false;
+  captchaResponse: string = undefined;
 
   constructor(
     private regsterService: RegisterService,
@@ -26,13 +27,14 @@ export class RegisterComponent {
     if (!this.captchaValid) {
       return;
     }
-    this.regsterService.register(this.user).subscribe(
+    this.regsterService.register(this.user, this.captchaResponse).subscribe(
         data => this.router.navigate(['login']),
         error => this.alertService.error(error)
     )
   }
 
   captchaResolved(captchaResponse: string) {
+    this.captchaResponse = captchaResponse;
     this.captchaValid = !!captchaResponse;
   }
 }

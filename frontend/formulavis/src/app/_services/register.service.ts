@@ -13,9 +13,9 @@ export class RegisterService {
     private http: Http
   ){}
 
-  register(user: User){
+  register(user: User, captchaResponse: string){
       return this.http.post(this.register_url,
-    {"username": user.name, "password": user.password})
+    {"username": user.name, "password": user.password, "recaptcha": captchaResponse})
     .map((response: Response) => response.ok);
   }
 }

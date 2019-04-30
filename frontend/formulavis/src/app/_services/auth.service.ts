@@ -26,9 +26,9 @@ export class AuthService {
     return new RequestOptions(options);
   }
 
-  tokenAuth(user: User){
+  tokenAuth(user: User, captchaResponse: string){
     return this.http.post(this.url_prefix+'api-token-auth/',
-      {"username": user.name, "password": user.password})
+      {"username": user.name, "password": user.password, "recaptcha": captchaResponse})
       .map((response: Response) =>
       {
         let data = response.json();

@@ -16,6 +16,7 @@ export class LoginComponent {
   user: User = new User;
 
   captchaValid: boolean = false;
+  captchaResponse: string = undefined;
 
   constructor(
     private authService: AuthService,
@@ -35,7 +36,7 @@ export class LoginComponent {
         returnUrl = next["returnUrl"];
     });
 
-    this.authService.tokenAuth(this.user).subscribe(
+    this.authService.tokenAuth(this.user, this.captchaResponse).subscribe(
       data => this.router.navigate([returnUrl]),
       error => this.alertService.error(error)
     );
@@ -46,6 +47,7 @@ export class LoginComponent {
   }
 
   captchaResolved(captchaResponse: string) {
+    this.captchaResponse = captchaResponse;
     this.captchaValid = !!captchaResponse;
   }
 }
