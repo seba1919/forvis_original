@@ -5,13 +5,14 @@ from datetime import datetime
 from django.utils import timezone
 from datetime import timedelta
 
+
 class Command(BaseCommand):
-	help= ''
+    help = ''
 
-	def handle(self, *args, **kwargs):
-    	users = User.objects.all()
-		now = datetime.now(tz=timezone.utc)
+    def handle(self, *args, **kwargs):
+    users = User.objects.all()
+    now = datetime.now(tz=timezone.utc)
 
-		for user in users:
-    		if now - user.last_login > timedelta(days=6*30):
-       			user.delete()
+    for user in users:
+        if now - user.last_login > timedelta(days=6*30):
+            user.delete()
