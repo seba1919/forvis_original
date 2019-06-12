@@ -19,12 +19,14 @@ FORMATS = (
     ('sat_vis_factor', 'sat_vis_factor'),
     ('sat_vis_interaction', 'sat_vis_interaction'),
     ('sat_vis_matrix', 'sat_vis_matrix'),
+    ('sat_vis_tree', 'sat_vis_tree'),
     ('sat_vis_resolution', 'sat_vis_resolution'),
     ('raw', 'raw'),
     ('variables', 'variables'),
     ('maxsat_vis_factor', 'maxsat_vis_factor'),
     ('maxsat_vis_interaction', 'maxsat_vis_interaction'),
     ('maxsat_vis_matrix', 'maxsat_vis_matrix'),
+    ('maxsat_vis_tree', 'maxsat_vis_tree'),
     ('maxsat_vis_resolution', 'maxsat_vis_resolution'),
 )
 

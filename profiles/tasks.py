@@ -3,6 +3,8 @@ import os
 import re
 import subprocess
 import time
+import queue
+import uuid
 
 from django.core.files import File
 
@@ -18,10 +20,12 @@ def create_json(obj_id, js_id, js_format, selected_vars):
         'sat_vis_factor': create_sat_vis_factor,
         'sat_vis_interaction': create_sat_vis_interaction,
         'sat_vis_matrix': create_sat_vis_matrix,
+        'sat_vis_tree': create_sat_vis_tree,
         'sat_vis_resolution': create_sat_vis_resolution,
         'maxsat_vis_factor': create_maxsat_vis_factor,
         'maxsat_vis_interaction': create_maxsat_vis_interaction,
         'maxsat_vis_matrix': create_maxsat_vis_matrix,
+        'maxsat_vis_tree': create_maxsat_vis_tree,
         'maxsat_vis_resolution': create_maxsat_vis_resolution,
         'variables': create_variables_list,
         'raw': create_raw
@@ -187,6 +191,45 @@ def create_sat_vis_matrix(obj_id, js_id, js_format, selected_vars):
     obj.content = data
     obj.status = 'done'
     obj.save()
+
+@app.task()
+def create_sat_vis_tree(obj_id, js_id, js_format, selected_vars):
+    print("SAT_VIS_TREE")
+
+    obj = JsonFile.objects.get(id=js_id)
+
+    obj.stJsonFileatus = 'pending'
+    obj.save()
+
+    data = {
+        "info": None,
+        "nodes": [],
+        "edges": []
+    }
+
+    formulas=[]
+
+    text_file = TextFile.objects.get(id=obj_id)
+    with open(text_file.content.path) as f:
+        for line in f:
+            if is_comment(line):
+                continue
+            if is_info(line):
+                data['info'] = get_info_array(line)
+            else:
+                formulas.append(get_numbers(line))
+        
+        tree = FormulaTree(formulas,0)
+        tree.serialize()
+        data['nodes'] = tree.nodes
+        print(tree.nodes)
+        data['edges'] = tree.edges
+        print(tree.edges)
+        
+    
+        obj.content = data
+        obj.status = 'done'
+        obj.save()
 
 @app.task()
 def create_sat_vis_resolution(obj_id, js_id, js_format, selected_vars):
@@ -494,6 +537,43 @@ def create_maxsat_vis_matrix(obj_id, js_id, js_format, selected_vars):
     obj.save()
 
 @app.task()
+def create_maxsat_vis_tree(obj_id, js_id, js_format, selected_vars):
+    print("MAXSAT_VIS_TREE")
+
+    obj = JsonFile.objects.get(id=js_id)
+
+    obj.stJsonFileatus = 'pending'
+    obj.save()
+
+    data = {
+        "info": None,
+        "nodes": [],
+        "edges": []
+    }
+
+    formulas=[]
+
+    text_file = TextFile.objects.get(id=obj_id)
+    with open(text_file.content.path) as f:
+        for line in f:
+            if is_comment(line):
+                continue
+            if is_info(line):
+                data['info'] = get_info_array(line)
+            else:
+                formulas.append(get_numbers(line))
+        tree = FormulaTree(formulas,0)
+        tree.serialize()
+        data['nodes'] = tree.nodes
+        print(tree.nodes)
+        data['edges'] = tree.edges
+        print(tree.edges)
+
+        obj.content = data
+        obj.status = 'done'
+        obj.save()
+
+@app.task()
 def create_maxsat_vis_resolution(obj_id, js_id, js_format, selected_vars):
     print("MAXSAT_VIS_RESOLUTION")
     obj = JsonFile.objects.get(id=js_id)
@@ -563,3 +643,104 @@ def get_clause_color(cw, min_cw, max_cw):
 
 def normalize_value(v, min_v, max_v):
 	return int((v - min_v) * 255 / (max_v - min_v))
+
+def is_comment(line):
+    if line.startswith('c') or line.startswith('C') or line in ['', ' ']:
+        return True
+    return False
+
+def is_info(line):
+    if line.startswith('p'):
+        return True
+    return False
+
+def get_info_array(line):
+    return line.split(' ')
+
+def get_numbers(line):
+    return [int(x) for x in list(filter(lambda x: x != '', line.strip().split(' ')))[:-1]]
+
+def join_lists(lst):
+    result=[]
+    [result.extend(el) for el in lst]
+    return result
+
+def most_common(lst):
+    if not lst or lst==[[]]:
+        return None
+    joined = join_lists(lst)
+    return max(joined, key=joined.count)
+
+class FormulaNode(object):
+    def __init__(self, formula_list,level):
+        self.children = []
+        self.id = str(uuid.uuid4())
+        self.level = level
+
+        self.data = most_common(formula_list)
+        self.formula_list = formula_list
+        
+        
+        for formula in self.formula_list:
+            formula.remove(self.data)
+
+        [self.add_child(child) for child in FormulaTree(formula_list,level+1).roots]
+                    
+    def add_child(self, obj):
+        self.children.append(obj)
+
+    def set_level(self,level):
+        self.level=level
+
+    def set_id(self,id):
+        self.id=id
+
+        
+        
+class FormulaTree(object):
+    def __init__(self, formula_list, start_level):
+        self.nodes = []
+        self.edges = []
+        
+        self.roots = []
+        self.grouped_formula = []
+        self.formula_list = self.group_formulas(formula_list)
+        
+        for formula in self.grouped_formula:
+            if (formula != [[]]):
+                self.roots.append(FormulaNode(formula,start_level))
+        
+    def group_formulas(self,lst):
+        formulas = []
+        tmp=[]
+        f=[]
+        root = most_common(lst) 
+        if not root:
+            return formulas
+        for formula in lst:
+            if root in formula:
+                f.append(formula)
+            else:
+                tmp.append(formula)
+        self.grouped_formula.append(f)
+        return self.group_formulas(tmp)
+    
+    
+    def serialize(self):
+        q = queue.Queue()
+        
+        
+        for root in self.roots:
+            q.put(root)
+
+        for root in self.roots:
+            root.set_level(0)
+            
+        
+        while not q.empty():
+            node = q.get()
+            for child in node.children:
+                self.edges.append({"from":node.id,"to":child.id, "color":{"color":'#ff383f'}})
+                q.put(child)
+
+            self.nodes.append({"id":node.id,"label":str(node.data), "level":node.level})

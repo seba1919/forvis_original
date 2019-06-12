@@ -22,6 +22,7 @@ import {VisualizationVisFactorComponent} from './visualization-vis_factor/visual
 import {VisualizationVisInteractionComponent} from './visualization-vis_interaction/visualization-vis_interaction.component';
 import {VisualizationVisResolutionComponent} from './visualization-vis_resolution/visualization-vis_resolution.component';
 import {VisualizationVisMatrixComponent} from './visualization-vis_matrix/visualization-vis_matrix.component';
+import {VisualizationVisTreeComponent} from './visualization-vis_tree/visualization-vis_tree.component'
 import {MaxsatComponent} from './maxsat/maxsat.component';
 import {SelectDropDownModule} from 'ngx-select-dropdown';
 import {RecaptchaModule} from "ng-recaptcha";
@@ -35,6 +36,7 @@ const appRoutes: Routes = [
   {path: 'visualization-vis_factor', component: VisualizationVisFactorComponent, canActivate: [AuthGuard]},
   {path: 'visualization-vis_interaction', component: VisualizationVisInteractionComponent, canActivate: [AuthGuard]},
   {path: 'visualization-vis_matrix', component: VisualizationVisMatrixComponent, canActivate: [AuthGuard]},
+  {path: 'visualization-vis_tree', component: VisualizationVisTreeComponent, canActivate: [AuthGuard]},
   {path: 'visualization-raw', component: VisualizationRawComponent, canActivate: [AuthGuard]},
   {path: 'sat', component: SatComponent, canActivate: [AuthGuard]},
   {path: 'maxsat', component: MaxsatComponent, canActivate: [AuthGuard]},
@@ -55,6 +57,7 @@ const appRoutes: Routes = [
     VisualizationVisFactorComponent,
     VisualizationVisInteractionComponent,
     VisualizationVisMatrixComponent,
+    VisualizationVisTreeComponent,
     VisualizationRawComponent,
     VisMenuComponent,
     MaxsatComponent

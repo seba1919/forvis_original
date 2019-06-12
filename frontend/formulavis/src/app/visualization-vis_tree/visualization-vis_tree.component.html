@@ -1,0 +1,8 @@
+<div class="subnav">
+    <h3>Tree ({{ fileName }})</h3>
+    <div id="info" *ngIf="info">
+        <div id="message" class="alert alert-info">{{ info }}</div>
+    </div>
+</div>
+<div id="visualization"></div>
+<div *ngIf="loading" class="loader"></div>
