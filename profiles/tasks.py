@@ -17,9 +17,11 @@ def create_json(obj_id, js_id, js_format, selected_vars):
     formats = {
         'sat_vis_factor': create_sat_vis_factor,
         'sat_vis_interaction': create_sat_vis_interaction,
+        'sat_vis_matrix': create_sat_vis_matrix,
         'sat_vis_resolution': create_sat_vis_resolution,
         'maxsat_vis_factor': create_maxsat_vis_factor,
         'maxsat_vis_interaction': create_maxsat_vis_interaction,
+        'maxsat_vis_matrix': create_maxsat_vis_matrix,
         'maxsat_vis_resolution': create_maxsat_vis_resolution,
         'variables': create_variables_list,
         'raw': create_raw
@@ -128,6 +130,63 @@ def create_sat_vis_interaction(obj_id, js_id, js_format, selected_vars):
     obj.status = 'done'
     obj.save()
 
+@app.task()
+def create_sat_vis_matrix(obj_id, js_id, js_format, selected_vars):
+    print("SAT_VIS_MATRIX")
+    obj = JsonFile.objects.get(id=js_id)
+
+    obj.status = 'pending'
+    obj.save()
+
+    data = {
+        "info": None,
+        "labels": [],
+        "rows": []
+    }
+
+    text_file = TextFile.objects.get(id=obj_id)
+    with open(text_file.content.path) as f:
+        text = File(f)
+        for line in text:
+            if line.startswith('c') or line.startswith('C') or line in ['', ' ']:
+                continue
+            if line.startswith('p'):
+                data['info'] = line.split(' ')
+                # initialize data['rows'] and data['labels']
+                numberOfVariables = int(data['info'][-2])
+                for indx1 in range(numberOfVariables):
+                    data['labels'].append(str(indx1))
+                    tmpRow = {
+                        "dependencies": []
+                    }
+                    for indx2 in range(numberOfVariables):
+                        if indx1 != indx2:
+                            tmpRow['dependencies'].append({
+                                "positive": 0,
+                                "negative": 0
+                            })
+                        else:
+                            tmpRow['dependencies'].append({
+                                "positive": -1,
+                                "negative": -1
+                            })
+                    data['rows'].append(tmpRow)
+            else:
+                numbers = [int(x) for x in list(filter(lambda x: x != '', line.strip().split(' ')))[:-1]]
+                if not numbers:
+                    continue
+                for n1 in numbers:
+                    for n2 in numbers:
+                        if n1 == n2:
+                            continue
+                        if n1 > 0:
+                            data['rows'][abs(n1)-1]['dependencies'][abs(n2)-1]['positive'] += 1
+                        else:
+                            data['rows'][abs(n1)-1]['dependencies'][abs(n2)-1]['negative'] += 1
+    
+    obj.content = data
+    obj.status = 'done'
+    obj.save()
 
 @app.task()
 def create_sat_vis_resolution(obj_id, js_id, js_format, selected_vars):
@@ -376,6 +435,63 @@ def create_maxsat_vis_interaction(obj_id, js_id, js_format, selected_vars):
     obj.status = 'done'
     obj.save()
 
+@app.task()
+def create_maxsat_vis_matrix(obj_id, js_id, js_format, selected_vars):
+    print("MAXSAT_VIS_MATRIX")
+    obj = JsonFile.objects.get(id=js_id)
+
+    obj.status = 'pending'
+    obj.save()
+
+    data = {
+        "info": None,
+        "labels": [],
+        "rows": []
+    }
+
+    text_file = TextFile.objects.get(id=obj_id)
+    with open(text_file.content.path) as f:
+        text = File(f)
+        for line in text:
+            if line.startswith('c') or line.startswith('C') or line in ['', ' ']:
+                continue
+            if line.startswith('p'):
+                data['info'] = line.split(' ')
+                # initialize data['rows'] and data['labels']
+                numberOfVariables = int(data['info'][-2])
+                for indx1 in range(numberOfVariables):
+                    data['labels'].append(str(indx1))
+                    tmpRow = {
+                        "dependencies": []
+                    }
+                    for indx2 in range(numberOfVariables):
+                        if indx1 != indx2:
+                            tmpRow['dependencies'].append({
+                                "positive": 0,
+                                "negative": 0
+                            })
+                        else:
+                            tmpRow['dependencies'].append({
+                                "positive": -1,
+                                "negative": -1
+                            })
+                    data['rows'].append(tmpRow)
+            else:
+                numbers = [int(x) for x in list(filter(lambda x: x != '', line.strip().split(' ')))[:-1]]
+                if not numbers:
+                    continue
+                for n1 in numbers:
+                    for n2 in numbers:
+                        if n1 == n2:
+                            continue
+                        if n1 > 0:
+                            data['rows'][abs(n1)-1]['dependencies'][abs(n2)-1]['positive'] += 1
+                        else:
+                            data['rows'][abs(n1)-1]['dependencies'][abs(n2)-1]['negative'] += 1
+    
+    obj.content = data
+    obj.status = 'done'
+    obj.save()
 
 @app.task()
 def create_maxsat_vis_resolution(obj_id, js_id, js_format, selected_vars):
