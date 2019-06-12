@@ -27,20 +27,20 @@ services:
       - "8000:8000"
 
   worker:
-      build:
-        dockerfile: ./Docker/backend/Dockerfile
-        context: .
-      links:
-        - postgres
-        - rabbit
-        - redis
-      depends_on:
-        - rabbit
-      volumes:
-        - ./:/usr/src/app
-      command: ./run_celery.sh
-      security_opt:
-        - label:disable
+    build:
+      dockerfile: ./Docker/backend/Dockerfile
+      context: .
+    links:
+      - postgres
+      - rabbit
+      - redis
+    depends_on:
+      - rabbit
+    volumes:
+      - ./:/usr/src/app
+    command: ./run_celery.sh
+    security_opt:
+      - label:disable
 
   frontend:
     build:
