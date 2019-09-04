@@ -1,0 +1,9 @@
+<div class="subnav">
+    <h3>Cluster Graph ({{ fileName }})</h3>
+    <div id="info" *ngIf="info">
+        <div id="message" class="alert alert-info">{{ info }}</div>
+    </div>
+</div>
+<div id="visualization"></div>
+<div id="zoom"></div>
+<div *ngIf="loading" class="loader"></div>

@@ -10,6 +10,7 @@ export class FileService {
   url_sat_file = '/api/profile/file/sat/';
   url_maxsat_files = '/api/profile/files/maxsat/';
   url_maxsat_file = '/api/profile/file/maxsat/';
+  url_clustered_file = '/api/profile/file/clustered/';
 
   constructor(
     private http: Http,
@@ -45,5 +46,11 @@ export class FileService {
 
   deleteMaxSatFile(id: number) {
     return this.http.delete(this.url_maxsat_file + id + '/del/', this.authService.authOptions());
+  }
+
+  getClusteredFile(id: number) {
+    return this.http.get(this.url_clustered_file + id + '/',
+      this.authService.authOptions())
+      .map((res: Response) => res.json());
   }
 }
